@@ -76,9 +76,9 @@ export default function Home() {
         <div className={`flex-1 ${state.phase === "search" ? "" : "px-4 pb-24 max-w-lg mx-auto w-full"}`}>
           {/* LANDING PAGE — Marketing layout */}
           {state.phase === "search" && (
-            <div className="relative flex flex-col">
-              {/* Storm atmosphere background */}
-              <div className="fixed inset-0 bg-[#0a0f1e] overflow-hidden -z-10">
+            <div className="relative">
+              {/* Storm atmosphere background — fixed to viewport */}
+              <div className="fixed inset-0 bg-[#0a0f1e] overflow-hidden" style={{ zIndex: -1 }}>
                 {/* Lightning texture overlay */}
                 <div className="absolute inset-0 opacity-[0.07]" style={{
                   backgroundImage: `url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
