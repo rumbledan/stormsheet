@@ -163,7 +163,7 @@ export default function Home() {
                         { short: "NOAA Verified", full: "NOAA Verified Data" },
                         { short: "NWS Sources", full: "National Weather Service Sources" },
                         { short: "5-Year History", full: "5-Year Storm History" },
-                        { short: "Insurance Ready", full: "Insurance-Ready Reports" },
+                        { short: "Homeowner Ready", full: "Homeowner-Ready Reports" },
                       ].map((item) => (
                         <div key={item.full} className="flex items-center gap-2 lg:gap-3">
                           <svg className="w-5 h-5 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
