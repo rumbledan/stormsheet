@@ -73,7 +73,7 @@ export default function Home() {
         )}
 
         {/* Content area */}
-        <div className={`flex-1 ${state.phase === "search" ? "" : "px-4 pb-24 max-w-lg mx-auto w-full"}`}>
+        <div className={state.phase === "search" ? "" : "flex-1 px-4 pb-24 max-w-lg mx-auto w-full"}>
           {/* LANDING PAGE — Marketing layout */}
           {state.phase === "search" && (
             <div className="relative">
