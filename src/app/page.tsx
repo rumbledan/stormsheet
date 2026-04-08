@@ -76,9 +76,9 @@ export default function Home() {
         <div className={`flex-1 ${state.phase === "search" ? "" : "px-4 pb-24 max-w-lg mx-auto w-full"}`}>
           {/* LANDING PAGE — Marketing layout */}
           {state.phase === "search" && (
-            <div className="relative min-h-screen flex flex-col">
+            <div className="relative flex flex-col">
               {/* Storm atmosphere background */}
-              <div className="absolute inset-0 bg-[#0a0f1e] overflow-hidden">
+              <div className="fixed inset-0 bg-[#0a0f1e] overflow-hidden -z-10">
                 {/* Lightning texture overlay */}
                 <div className="absolute inset-0 opacity-[0.07]" style={{
                   backgroundImage: `url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
@@ -104,7 +104,7 @@ export default function Home() {
               </nav>
 
               {/* Hero — two column: text left, report preview right */}
-              <div className="relative z-10 flex-1 flex items-center px-6 sm:px-10 pb-8">
+              <div className="relative z-10 px-6 sm:px-10 py-10 lg:py-16">
                 <div className="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                   {/* LEFT — Content */}
                   <div className="space-y-7">
@@ -187,10 +187,20 @@ export default function Home() {
 
                           {/* Two boxes: map + stats */}
                           <div className="grid grid-cols-2 gap-2">
-                            {/* Map placeholder */}
-                            <div className="bg-gradient-to-br from-green-800 to-green-900 rounded h-24 flex items-center justify-center relative overflow-hidden">
-                              <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 30% 40%, #4ade80 1px, transparent 1px), radial-gradient(circle at 70% 60%, #facc15 1px, transparent 1px), radial-gradient(circle at 50% 30%, #f87171 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-                              <span className="text-[7px] text-green-300 font-medium z-10">Satellite Map</span>
+                            {/* Map — satellite-style visual */}
+                            <div className="bg-gradient-to-br from-[#2d5a27] via-[#3a6b32] to-[#4a7a3f] rounded h-24 relative overflow-hidden">
+                              {/* Road grid pattern */}
+                              <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(90deg, rgba(200,200,180,0.2) 1px, transparent 1px), linear-gradient(0deg, rgba(200,200,180,0.15) 1px, transparent 1px)", backgroundSize: "18px 14px" }} />
+                              {/* Darker patches for buildings/terrain */}
+                              <div className="absolute top-2 left-3 w-6 h-4 bg-[#3d6335]/80 rounded-sm" />
+                              <div className="absolute top-6 right-4 w-8 h-3 bg-[#2d5025]/60 rounded-sm" />
+                              <div className="absolute bottom-4 left-6 w-5 h-5 bg-[#4a7a3f]/70 rounded-sm" />
+                              {/* Blue pin markers */}
+                              {[[15,20],[35,45],[55,30],[25,65],[70,55],[45,75],[60,15]].map(([x,y], i) => (
+                                <div key={i} className="absolute w-2 h-2 bg-blue-400 rounded-full border border-blue-200 shadow-sm shadow-blue-400/50" style={{ left: `${x}%`, top: `${y}%` }} />
+                              ))}
+                              {/* Center property marker */}
+                              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-md" />
                             </div>
                             {/* Stats */}
                             <div className="flex flex-col items-center justify-center bg-gray-50 rounded p-2">
