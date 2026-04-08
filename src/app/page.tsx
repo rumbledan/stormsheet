@@ -20,13 +20,41 @@ export default function Home() {
   const { state, search, reset } = useStormSearch();
   const [pdfStatus, setPdfStatus] = useState<"idle" | "generating">("idle");
   const [placesLoaded, setPlacesLoaded] = useState(false);
+  const [customLogo, setCustomLogo] = useState<string | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  // Load custom logo from localStorage on mount
+  useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("stormsheet_custom_logo");
+      if (saved) setCustomLogo(saved);
+    }
+  });
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      setCustomLogo(base64);
+      localStorage.setItem("stormsheet_custom_logo", base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    setCustomLogo(null);
+    localStorage.removeItem("stormsheet_custom_logo");
+    if (logoInputRef.current) logoInputRef.current.value = "";
+  };
 
   const handleDownload = async () => {
     if (state.phase !== "results" || pdfStatus === "generating") return;
     setPdfStatus("generating");
     try {
-      const pdfBase64 = await generateStormReportPdf(state.data, mapRef.current);
+      const pdfBase64 = await generateStormReportPdf(state.data, mapRef.current, customLogo);
       downloadPdf(pdfBase64, state.data.address);
     } catch (err) {
       console.error("[pdf] Generation failed:", err);
@@ -317,10 +345,47 @@ export default function Home() {
           )}
         </div>
 
-        {/* Sticky download button — visible during results phase */}
+        {/* Sticky download area — logo upload + download button */}
         {state.phase === "results" && (
           <div className="fixed bottom-0 left-0 right-0 z-40 bg-brand-bg/95 backdrop-blur border-t border-brand-border p-4">
-            <div className="max-w-lg mx-auto">
+            <div className="max-w-lg mx-auto space-y-3">
+              {/* Logo upload section */}
+              <div className="flex items-center justify-between">
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+                {customLogo ? (
+                  <div className="flex items-center gap-3 flex-1">
+                    <img src={customLogo} alt="Your logo" className="h-8 max-w-[120px] object-contain rounded" />
+                    <span className="text-brand-text-secondary text-xs">Your logo on report</span>
+                    <button
+                      onClick={handleRemoveLogo}
+                      className="ml-auto text-brand-text-secondary hover:text-brand-tornado-red text-xs flex items-center gap-1 transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => logoInputRef.current?.click()}
+                    className="flex items-center gap-2 text-sm text-brand-text-secondary hover:text-brand-gold transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Add your company logo to the report
+                  </button>
+                )}
+              </div>
+
+              {/* Download button */}
               <button
                 onClick={handleDownload}
                 disabled={pdfStatus === "generating"}

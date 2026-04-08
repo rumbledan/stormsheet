@@ -83,7 +83,7 @@ function buildProximityData(events: StormEvent[]) {
 }
 
 // =============================================
-export async function generateStormReportPdf(result: SearchResult, mapElement: HTMLElement | null): Promise<string> {
+export async function generateStormReportPdf(result: SearchResult, mapElement: HTMLElement | null, customLogoBase64?: string | null): Promise<string> {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" });
   const pw = doc.internal.pageSize.getWidth();
   const ph = doc.internal.pageSize.getHeight();
@@ -95,8 +95,11 @@ export async function generateStormReportPdf(result: SearchResult, mapElement: H
     loadImage("/stormsheet-logo.png", 300).catch(() => null),
   ]);
 
+  // Use custom logo if provided, otherwise fall back to StormSheet logo
+  const headerLogo = customLogoBase64 || ssLogo;
+
   // PAGE 1
-  let y = renderHeader(doc, ssLogo, pw, m, cw);
+  let y = renderHeader(doc, headerLogo, pw, m, cw);
   y = renderPropertyBoxes(doc, result, m, y, cw);
   y = renderStatsRow(doc, result, m, y, cw);
   y = renderTwoColumns(doc, result, m, y, cw);
@@ -106,7 +109,7 @@ export async function generateStormReportPdf(result: SearchResult, mapElement: H
 
   // PAGE 2
   doc.addPage();
-  let y2 = renderP2Header(doc, ssLogo, pw, m);
+  let y2 = renderP2Header(doc, headerLogo, pw, m);
   y2 = renderReviewBox(doc, result, m, y2, cw);
   y2 = renderFullTable(doc, result, m, y2, cw, ph);
   // CTA at the BOTTOM, centered, prominent
