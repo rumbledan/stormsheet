@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Script from "next/script";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -25,12 +25,10 @@ export default function Home() {
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Load custom logo from localStorage on mount
-  useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("stormsheet_custom_logo");
-      if (saved) setCustomLogo(saved);
-    }
-  });
+  useEffect(() => {
+    const saved = localStorage.getItem("stormsheet_custom_logo");
+    if (saved) setCustomLogo(saved);
+  }, []);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
