@@ -131,19 +131,22 @@ export default function Home() {
                       )}
                     </div>
 
-                    {/* Trust bullets — vertical stack */}
-                    <div className="flex flex-col gap-3 pt-2">
+                    {/* Trust bullets — 2x2 grid on mobile, vertical stack on desktop */}
+                    <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 pt-2">
                       {[
-                        "NOAA Verified Data",
-                        "National Weather Service Sources",
-                        "5-Year Storm History",
-                        "Insurance-Ready Reports",
+                        { short: "NOAA Verified", full: "NOAA Verified Data" },
+                        { short: "NWS Sources", full: "National Weather Service Sources" },
+                        { short: "5-Year History", full: "5-Year Storm History" },
+                        { short: "Insurance Ready", full: "Insurance-Ready Reports" },
                       ].map((item) => (
-                        <div key={item} className="flex items-center gap-3">
+                        <div key={item.full} className="flex items-center gap-2 lg:gap-3">
                           <svg className="w-5 h-5 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" fillRule="evenodd" clipRule="evenodd" />
                           </svg>
-                          <span className="text-base font-medium text-gray-200">{item}</span>
+                          <span className="text-sm lg:text-base font-medium text-gray-200">
+                            <span className="lg:hidden">{item.short}</span>
+                            <span className="hidden lg:inline">{item.full}</span>
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -162,7 +165,7 @@ export default function Home() {
                   </div>
 
                   {/* RIGHT — Tilted report preview (CSS mockup) */}
-                  <div className="hidden lg:flex justify-center items-center">
+                  <div className="flex justify-center items-center mt-8 lg:mt-0">
                     <div className="relative" style={{ perspective: "1200px" }}>
                       <div
                         className="relative w-[340px] shadow-2xl shadow-blue-500/10"
@@ -233,11 +236,16 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Footer line */}
-              <div className="relative z-10 pb-8 text-center">
-                <p className="text-sm text-gray-500">
-                  Used by homeowners, contractors, and insurance professionals
-                </p>
+              {/* Footer */}
+              <div className="relative z-10 pb-8 px-6 sm:px-10 space-y-4">
+                <div className="max-w-6xl mx-auto border-t border-white/10 pt-6">
+                  <p className="text-sm text-gray-400 text-center">
+                    Used by homeowners, contractors, and insurance professionals
+                  </p>
+                  <p className="text-[11px] text-gray-600 text-center mt-3 max-w-3xl mx-auto leading-relaxed">
+                    Storm data is sourced in real-time from multiple NOAA and National Weather Service (NWS) databases. This report is intended for informational and homeowner education purposes only and may be used by homeowners, contractors, and insurance professionals. StormSheet is not affiliated with or endorsed by NOAA or NWS. &copy; 2026 StormSheet. All rights reserved.
+                  </p>
+                </div>
               </div>
             </div>
           )}
