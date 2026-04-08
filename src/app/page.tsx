@@ -10,16 +10,30 @@ import LoadingScreen from "@/components/LoadingScreen";
 import ResultsSummary from "@/components/ResultsSummary";
 import BestClaimDate from "@/components/BestClaimDate";
 import EventList from "@/components/EventList";
-import EmailModal from "@/components/EmailModal";
+import { generateStormReportPdf } from "@/lib/pdf";
+import { downloadPdf } from "@/lib/email";
 
 // Leaflet must be loaded client-side only
 const StormMap = dynamic(() => import("@/components/StormMap"), { ssr: false });
 
 export default function Home() {
   const { state, search, reset } = useStormSearch();
-  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [pdfStatus, setPdfStatus] = useState<"idle" | "generating">("idle");
   const [placesLoaded, setPlacesLoaded] = useState(false);
   const mapRef = useRef<HTMLDivElement | null>(null);
+
+  const handleDownload = async () => {
+    if (state.phase !== "results" || pdfStatus === "generating") return;
+    setPdfStatus("generating");
+    try {
+      const pdfBase64 = await generateStormReportPdf(state.data, mapRef.current);
+      downloadPdf(pdfBase64, state.data.address);
+    } catch (err) {
+      console.error("[pdf] Generation failed:", err);
+    } finally {
+      setPdfStatus("idle");
+    }
+  };
 
   return (
     <>
@@ -30,55 +44,117 @@ export default function Home() {
       />
 
       <main className="min-h-screen flex flex-col">
-        {/* Header — always visible, white logo */}
-        <header className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur border-b border-brand-border px-4 py-3">
-          <div className="max-w-lg mx-auto flex items-center gap-3">
-            <Image
-              src="/stormsheet-logo.png"
-              alt="StormSheet"
-              width={160}
-              height={36}
-              className="flex-shrink-0 h-9 w-auto"
-            />
-            <div className="flex-1 min-w-0">
-              {state.phase === "results" ? (
-                <button
-                  onClick={reset}
-                  className="text-brand-text-secondary text-xs hover:text-brand-gold transition-colors flex items-center gap-1"
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  New Search
-                </button>
-              ) : (
-                <h1 className="text-brand-text-primary text-sm font-semibold truncate">
-                  StormSheet
-                </h1>
-              )}
+        {/* Header — results mode: compact bar. Search mode: part of hero */}
+        {state.phase !== "search" && (
+          <header className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur border-b border-brand-border px-4 py-3">
+            <div className="max-w-lg mx-auto flex items-center gap-3">
+              <Image
+                src="/stormsheet-logo.png"
+                alt="StormSheet"
+                width={160}
+                height={36}
+                className="flex-shrink-0 h-9 w-auto"
+              />
+              <div className="flex-1 min-w-0">
+                {state.phase === "results" && (
+                  <button
+                    onClick={reset}
+                    className="text-brand-text-secondary text-xs hover:text-brand-gold transition-colors flex items-center gap-1"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    New Search
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
         {/* Content area */}
-        <div className="flex-1 px-4 pb-24 max-w-lg mx-auto w-full">
-          {/* Search phase */}
+        <div className={`flex-1 ${state.phase === "search" ? "" : "px-4 pb-24 max-w-lg mx-auto w-full"}`}>
+          {/* LANDING PAGE — Marketing layout */}
           {state.phase === "search" && (
-            <div className="pt-8 space-y-6">
-              <div className="text-center">
-                <h2 className="text-brand-gold text-xl font-bold mb-2">
-                  Property Storm History
-                </h2>
-                <p className="text-brand-text-secondary text-sm">
-                  Enter a property address to pull 5 years of verified storm data from NOAA
+            <div className="relative min-h-screen flex flex-col">
+              {/* Storm atmosphere background */}
+              <div className="absolute inset-0 bg-[#0a0f1e] overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(59,130,246,0.15)_0%,_transparent_50%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(59,130,246,0.08)_0%,_transparent_40%)]" />
+                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle,_rgba(59,130,246,0.06)_0%,_transparent_70%)] animate-pulse" style={{ animationDuration: "4s" }} />
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+              </div>
+
+              {/* Nav */}
+              <nav className="relative z-10 px-6 py-5">
+                <div className="max-w-4xl mx-auto">
+                  <Image
+                    src="/stormsheet-logo.png"
+                    alt="StormSheet"
+                    width={180}
+                    height={40}
+                    className="h-10 w-auto"
+                  />
+                </div>
+              </nav>
+
+              {/* Hero */}
+              <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pb-16 -mt-8">
+                <div className="max-w-2xl mx-auto text-center space-y-6">
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
+                    Know Your Property&apos;s Storm History{" "}
+                    <span className="text-blue-400">in Seconds</span>
+                  </h1>
+                  <p className="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto">
+                    Verified NOAA + NWS storm data. Instant, insurance-ready reports.
+                  </p>
+
+                  {/* Search input — large, prominent */}
+                  <div className="pt-4 max-w-xl mx-auto w-full">
+                    {placesLoaded ? (
+                      <SearchBar onSearch={search} />
+                    ) : (
+                      <div className="text-center text-gray-500 text-sm py-4">
+                        Loading address search...
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Trust bullets */}
+                  <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 pt-4">
+                    {[
+                      "NOAA Verified Data",
+                      "National Weather Service Sources",
+                      "5-Year Storm History",
+                      "Insurance-Ready Reports",
+                    ].map((item) => (
+                      <div key={item} className="flex items-center gap-2 text-sm text-gray-300">
+                        <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Social proof */}
+                  <div className="pt-6">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+                      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                      <span className="text-sm text-gray-400">
+                        Last report: <span className="text-gray-200">3 hail events, 2 high-wind events detected</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer line */}
+              <div className="relative z-10 pb-8 text-center">
+                <p className="text-xs text-gray-500">
+                  Used by homeowners, contractors, and insurance professionals
                 </p>
               </div>
-              {placesLoaded && <SearchBar onSearch={search} />}
-              {!placesLoaded && (
-                <div className="text-center text-brand-text-secondary text-sm">
-                  Loading address search...
-                </div>
-              )}
             </div>
           )}
 
@@ -139,31 +215,31 @@ export default function Home() {
           )}
         </div>
 
-        {/* Sticky email button — visible during results phase */}
+        {/* Sticky download button — visible during results phase */}
         {state.phase === "results" && (
           <div className="fixed bottom-0 left-0 right-0 z-40 bg-brand-bg/95 backdrop-blur border-t border-brand-border p-4">
             <div className="max-w-lg mx-auto">
               <button
-                onClick={() => setEmailModalOpen(true)}
-                className="w-full py-3.5 bg-brand-gold hover:bg-brand-gold-hover text-brand-bg font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-base"
+                onClick={handleDownload}
+                disabled={pdfStatus === "generating"}
+                className="w-full py-3.5 bg-brand-gold hover:bg-brand-gold-hover text-brand-bg font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-base disabled:opacity-60"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Email Storm Report
+                {pdfStatus === "generating" ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-brand-bg/30 border-t-brand-bg rounded-full animate-spin" />
+                    Generating PDF...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download Storm Report
+                  </>
+                )}
               </button>
             </div>
           </div>
-        )}
-
-        {/* Email modal */}
-        {state.phase === "results" && (
-          <EmailModal
-            isOpen={emailModalOpen}
-            onClose={() => setEmailModalOpen(false)}
-            result={state.data}
-            mapElement={mapRef.current}
-          />
         )}
       </main>
     </>

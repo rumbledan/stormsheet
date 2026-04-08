@@ -124,22 +124,23 @@ export async function generateStormReportPdf(result: SearchResult, mapElement: H
 // HEADER — Logo | divider | Title RIGHT
 // =============================================
 function renderHeader(doc: jsPDF, logo: string | null, pw: number, m: number, cw: number): number {
-  const rowY = 7, logoH = 14;
-  if (logo) { try { doc.addImage(logo, "PNG", m, rowY, 34, logoH); } catch {/**/} }
-  else { doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(...C.dark); doc.text("STORMSHEET", m, rowY + 9); }
+  const rowY = 8, logoH = 10;
+  const logoW = 42; // wider aspect ratio for the StormSheet logo
+  if (logo) { try { doc.addImage(logo, "PNG", m, rowY, logoW, logoH); } catch {/**/} }
+  else { doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(...C.dark); doc.text("STORMSHEET", m, rowY + 7); }
 
   // Vertical divider
-  const divX = m + 40;
+  const divX = m + logoW + 4;
   doc.setDrawColor(...C.medGray); doc.setLineWidth(0.3);
   doc.line(divX, rowY + 1, divX, rowY + logoH - 1);
 
   // Title right of divider, vertically centered
-  doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(...C.dark);
-  doc.text("STORM DAMAGE HISTORY REPORT", divX + 5, rowY + 9);
+  doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(...C.dark);
+  doc.text("STORM DAMAGE HISTORY REPORT", divX + 5, rowY + 7);
 
   doc.setDrawColor(...C.medGray); doc.setLineWidth(0.3);
-  doc.line(m, rowY + logoH + 2, pw - m, rowY + logoH + 2);
-  return rowY + logoH + 6;
+  doc.line(m, rowY + logoH + 3, pw - m, rowY + logoH + 3);
+  return rowY + logoH + 7;
 }
 
 // =============================================
@@ -433,12 +434,12 @@ function renderFooter(doc: jsPDF, pw: number, ph: number, m: number, cw: number)
 // PAGE 2
 // =============================================
 function renderP2Header(doc: jsPDF, logo: string | null, pw: number, m: number): number {
-  if (logo) { try { doc.addImage(logo, "PNG", m, 5, 26, 10); } catch {/**/} }
+  if (logo) { try { doc.addImage(logo, "PNG", m, 6, 34, 8); } catch {/**/} }
   doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...C.dark);
   const t = "STORM DAMAGE HISTORY REPORT";
   doc.text(t, pw - m - doc.getTextWidth(t), 12);
   doc.setDrawColor(...C.medGray); doc.setLineWidth(0.3); doc.line(m, 17, pw - m, 17);
-  return 21;
+  return 23;
 }
 
 function renderReviewBox(doc: jsPDF, result: SearchResult, m: number, y: number, cw: number): number {
@@ -550,13 +551,13 @@ function renderFullTable(doc: jsPDF, result: SearchResult, m: number, y: number,
   };
 
   // Header row — dark background for contrast
-  doc.setFillColor(...C.navy); doc.rect(m, y, cw, 6, "F");
+  doc.setFillColor(...C.navy); doc.rect(m, y, cw, 6.5, "F");
   doc.setFont("helvetica", "bold"); doc.setFontSize(7); doc.setTextColor(...C.white);
-  doc.text("Date", cols.date, y + 4); doc.text("Type", cols.type, y + 4);
-  doc.text("Magnitude", cols.mag, y + 4); doc.text("Distance", cols.dist, y + 4);
-  doc.text("Severity", cols.sev, y + 4); doc.text("Status", cols.status, y + 4);
-  doc.text("RADAR DATA", cols.radar, y + 4);
-  y += 7.5;
+  doc.text("Date", cols.date, y + 4.5); doc.text("Type", cols.type, y + 4.5);
+  doc.text("Magnitude", cols.mag, y + 4.5); doc.text("Distance", cols.dist, y + 4.5);
+  doc.text("Severity", cols.sev, y + 4.5); doc.text("Status", cols.status, y + 4.5);
+  doc.text("RADAR DATA", cols.radar, y + 4.5);
+  y += 8;
 
   // Leave room for CTA at bottom: stop table earlier
   const tableBottom = ph - 70;

@@ -51,7 +51,7 @@ export default function SearchBar({ onSearch, disabled }: SearchBarProps) {
       <div className="flex gap-2">
         <div className="relative flex-1">
           <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-text-secondary"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -76,18 +76,15 @@ export default function SearchBar({ onSearch, disabled }: SearchBarProps) {
             onChange={(e) => setValue(e.target.value)}
             placeholder="Enter property address"
             disabled={disabled}
-            className="w-full pl-10 pr-4 py-3 bg-brand-card border border-brand-border rounded-lg text-brand-text-primary placeholder-brand-text-secondary focus:outline-none focus:border-brand-gold transition-colors"
+            className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:bg-white/[0.12] transition-all text-base"
           />
         </div>
         <button
           type="submit"
           disabled={disabled || !value.trim()}
-          className="px-6 py-3 bg-brand-gold hover:bg-brand-gold-hover text-brand-bg font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-8 py-4 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-base whitespace-nowrap"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          Search
+          Get Report
         </button>
       </div>
     </form>
