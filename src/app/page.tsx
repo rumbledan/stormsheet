@@ -79,71 +79,155 @@ export default function Home() {
             <div className="relative min-h-screen flex flex-col">
               {/* Storm atmosphere background */}
               <div className="absolute inset-0 bg-[#0a0f1e] overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(59,130,246,0.15)_0%,_transparent_50%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(59,130,246,0.08)_0%,_transparent_40%)]" />
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle,_rgba(59,130,246,0.06)_0%,_transparent_70%)] animate-pulse" style={{ animationDuration: "4s" }} />
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+                {/* Lightning texture overlay */}
+                <div className="absolute inset-0 opacity-[0.07]" style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+                }} />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(59,130,246,0.18)_0%,_transparent_50%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(59,130,246,0.1)_0%,_transparent_45%)]" />
+                <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-[radial-gradient(circle,_rgba(59,130,246,0.08)_0%,_transparent_70%)] animate-pulse" style={{ animationDuration: "5s" }} />
+                {/* Subtle horizontal glow line */}
+                <div className="absolute bottom-[12%] left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
               </div>
 
               {/* Nav */}
-              <nav className="relative z-10 px-6 py-5">
-                <div className="max-w-4xl mx-auto">
+              <nav className="relative z-10 px-6 sm:px-10 py-6">
+                <div className="max-w-6xl mx-auto">
                   <Image
                     src="/stormsheet-logo.png"
                     alt="StormSheet"
-                    width={180}
-                    height={40}
+                    width={200}
+                    height={44}
                     className="h-10 w-auto"
                   />
                 </div>
               </nav>
 
-              {/* Hero */}
-              <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pb-16 -mt-8">
-                <div className="max-w-2xl mx-auto text-center space-y-6">
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
-                    Know Your Property&apos;s Storm History{" "}
-                    <span className="text-blue-400">in Seconds</span>
-                  </h1>
-                  <p className="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto">
-                    Verified NOAA + NWS storm data. Instant, insurance-ready reports.
-                  </p>
+              {/* Hero — two column: text left, report preview right */}
+              <div className="relative z-10 flex-1 flex items-center px-6 sm:px-10 pb-8">
+                <div className="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                  {/* LEFT — Content */}
+                  <div className="space-y-7">
+                    <h1 className="text-4xl sm:text-5xl xl:text-[3.4rem] font-extrabold text-white leading-[1.1] tracking-tight">
+                      Know Your Property&apos;s{" "}
+                      <br className="hidden sm:block" />
+                      Storm History{" "}
+                      <span className="text-blue-400">in Seconds</span>
+                    </h1>
+                    <p className="text-lg text-gray-400 leading-relaxed max-w-lg">
+                      Verified NOAA + NWS storm data.
+                      <br />
+                      Instant, homeowner-ready reports.
+                    </p>
 
-                  {/* Search input — large, prominent */}
-                  <div className="pt-4 max-w-xl mx-auto w-full">
-                    {placesLoaded ? (
-                      <SearchBar onSearch={search} />
-                    ) : (
-                      <div className="text-center text-gray-500 text-sm py-4">
-                        Loading address search...
-                      </div>
-                    )}
-                  </div>
+                    {/* Search input — full width, prominent */}
+                    <div className="max-w-lg">
+                      {placesLoaded ? (
+                        <SearchBar onSearch={search} />
+                      ) : (
+                        <div className="text-gray-500 text-sm py-4">
+                          Loading address search...
+                        </div>
+                      )}
+                    </div>
 
-                  {/* Trust bullets */}
-                  <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 pt-4">
-                    {[
-                      "NOAA Verified Data",
-                      "National Weather Service Sources",
-                      "5-Year Storm History",
-                      "Insurance-Ready Reports",
-                    ].map((item) => (
-                      <div key={item} className="flex items-center gap-2 text-sm text-gray-300">
-                        <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    {/* Trust bullets — vertical stack */}
+                    <div className="flex flex-col gap-3 pt-2">
+                      {[
+                        "NOAA Verified Data",
+                        "National Weather Service Sources",
+                        "5-Year Storm History",
+                        "Insurance-Ready Reports",
+                      ].map((item) => (
+                        <div key={item} className="flex items-center gap-3">
+                          <svg className="w-5 h-5 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" fillRule="evenodd" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-base font-medium text-gray-200">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Social proof */}
+                    <div className="pt-2">
+                      <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/5 border border-white/10">
+                        <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                         </svg>
-                        {item}
+                        <span className="text-sm text-gray-400">
+                          Last report: <span className="text-white font-medium">3 hail events, 2 high-wind events detected</span>
+                        </span>
                       </div>
-                    ))}
+                    </div>
                   </div>
 
-                  {/* Social proof */}
-                  <div className="pt-6">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                      <span className="text-sm text-gray-400">
-                        Last report: <span className="text-gray-200">3 hail events, 2 high-wind events detected</span>
-                      </span>
+                  {/* RIGHT — Tilted report preview (CSS mockup) */}
+                  <div className="hidden lg:flex justify-center items-center">
+                    <div className="relative" style={{ perspective: "1200px" }}>
+                      <div
+                        className="relative w-[340px] shadow-2xl shadow-blue-500/10"
+                        style={{ transform: "rotateY(-8deg) rotateX(4deg) rotateZ(-2deg)" }}
+                      >
+                        {/* Page 1 — front */}
+                        <div className="bg-white rounded-lg p-5 space-y-3">
+                          {/* Header */}
+                          <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                            <Image src="/stormsheet-logo.png" alt="" width={100} height={22} className="h-5 w-auto opacity-80" />
+                            <span className="text-[8px] font-bold text-gray-600 tracking-wider">STORM DAMAGE REPORT</span>
+                          </div>
+
+                          {/* Title */}
+                          <div className="text-center py-1">
+                            <p className="text-[11px] font-extrabold text-gray-800 tracking-wide">STORMSHEET PROPERTY REPORT</p>
+                            <p className="text-[7px] text-gray-500 mt-0.5">1629 Bland St, Benton, Saline County, AR 72201</p>
+                          </div>
+
+                          {/* Two boxes: map + stats */}
+                          <div className="grid grid-cols-2 gap-2">
+                            {/* Map placeholder */}
+                            <div className="bg-gradient-to-br from-green-800 to-green-900 rounded h-24 flex items-center justify-center relative overflow-hidden">
+                              <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 30% 40%, #4ade80 1px, transparent 1px), radial-gradient(circle at 70% 60%, #facc15 1px, transparent 1px), radial-gradient(circle at 50% 30%, #f87171 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+                              <span className="text-[7px] text-green-300 font-medium z-10">Satellite Map</span>
+                            </div>
+                            {/* Stats */}
+                            <div className="flex flex-col items-center justify-center bg-gray-50 rounded p-2">
+                              <div className="w-14 h-8 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 rounded-t-full relative mb-1">
+                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-5 bg-gray-800 origin-bottom rounded-full" style={{ transform: "rotate(35deg)" }} />
+                              </div>
+                              <p className="text-[13px] font-extrabold text-gray-800">12 Storm Events</p>
+                              <p className="text-[6px] text-gray-500">Including 3 clusters</p>
+                              <p className="text-[6px] text-gray-500">8 Hail, 2 Wind, 1 Tornado</p>
+                            </div>
+                          </div>
+
+                          {/* Mini table */}
+                          <div className="space-y-0">
+                            <div className="grid grid-cols-7 gap-0.5 bg-[#1e3a5f] text-white text-[5px] font-bold px-1 py-1 rounded-t">
+                              <span>Date</span><span>Type</span><span>Magnitude</span><span>Distance</span><span>Severity</span><span>Status</span><span>Radar</span>
+                            </div>
+                            {[0,1,2,3,4,5,6].map((i) => (
+                              <div key={i} className={`grid grid-cols-7 gap-0.5 text-[5px] px-1 py-0.5 ${i % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
+                                <span className="text-gray-600">Apr {12+i}, 2025</span>
+                                <span className="text-gray-700 font-medium">HAIL</span>
+                                <span className="text-gray-600">1.{i}0&quot;</span>
+                                <span className="text-gray-600">{(0.5+i*0.3).toFixed(1)} mi</span>
+                                <span className="text-orange-600 font-medium">Moderate</span>
+                                <span className="text-gray-500">HISTORICAL</span>
+                                <span className="text-gray-400 truncate">KLZK</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Footer logos */}
+                          <div className="flex items-center justify-center gap-3 pt-1 border-t border-gray-100">
+                            <span className="text-[5px] text-gray-400">Powered by NOAA + NWS federal data</span>
+                          </div>
+                        </div>
+
+                        {/* Shadow/depth effect — second page peeking behind */}
+                        <div className="absolute -bottom-2 -right-2 w-full h-full bg-white/80 rounded-lg -z-10 border border-gray-200" style={{ transform: "rotate(2deg)" }} />
+                        <div className="absolute -bottom-4 -right-3 w-full h-full bg-white/50 rounded-lg -z-20 border border-gray-200" style={{ transform: "rotate(4deg)" }} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -151,7 +235,7 @@ export default function Home() {
 
               {/* Footer line */}
               <div className="relative z-10 pb-8 text-center">
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-gray-500">
                   Used by homeowners, contractors, and insurance professionals
                 </p>
               </div>
